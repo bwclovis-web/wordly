@@ -124,11 +124,16 @@ records whose text mentions a changed record's title, `fields.name`, or
 
 ### Idempotency
 
-The `packageId` is recorded with a hash of the normalized package content.
+The `packageId` is recorded per project, together with a hash of the
+normalized package content. The key is (`projectId`, `packageId`).
 
-- Same `packageId` and same content: the result is `already_applied`. Nothing
-  is written, and the original change summary is returned.
+- Same `packageId` and same content in the same project: the result is
+  `already_applied`. Nothing is written, and the original change summary is returned.
 - Same `packageId` but different content: the package is rejected with `PACKAGE_ID_CONFLICT`.
+- A workspace restored from backup as a copy (new IDs) keeps its own record of
+  applied packages, so a package already applied before the backup is
+  `already_applied` in the copy as well, and applying a new package to one copy
+  never marks it applied in the other.
 
 ## Issue codes
 

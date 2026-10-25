@@ -1,6 +1,6 @@
 import { ulid } from "ulid";
 
-export type IdPrefix = "wsp" | "prj" | "rec" | "rev" | "pkg" | "src" | "aud" | "rvw";
+export type IdPrefix = "wsp" | "prj" | "rec" | "rev" | "pkg" | "src" | "aud" | "rvw" | "imp" | "bat";
 
 export function newId(prefix: IdPrefix): string {
   return `${prefix}_${ulid()}`;

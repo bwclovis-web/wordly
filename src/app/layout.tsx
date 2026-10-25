@@ -15,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Link href="/" className="brand">
             Wordly Editor
           </Link>
+          <Link href="/backup">Backup &amp; restore</Link>
           <span className="note">Local only (127.0.0.1)</span>
         </header>
         <main>{children}</main>

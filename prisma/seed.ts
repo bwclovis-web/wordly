@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { createDb } from "../src/server/db";
+import { databaseFilePath, fileUrl } from "../src/server/dbLocation";
 import { createProject, createWorkspace } from "../src/server/services/projectService";
 import { createRecord } from "../src/server/services/recordService";
 
@@ -19,7 +20,7 @@ const DEMO_IDS = {
 } as const;
 
 async function main() {
-  const db = createDb(process.env.DATABASE_URL ?? "file:./prisma/dev.db");
+  const db = createDb(fileUrl(databaseFilePath()));
   try {
     if (await db.workspace.findUnique({ where: { id: DEMO_IDS.workspace } })) {
       console.log("Demo data already present; nothing to do.");

@@ -89,7 +89,7 @@ Today, the same workflow runs manually: export a
 
 ### 6. Audit history and idempotency
 
-- `packageId` is the idempotency key. Retries from ChatGPT or the network
+- (`projectId`, `packageId`) is the idempotency key. Retries from ChatGPT or the network
   then cannot double-apply. Re-sending the same package returns the original
   result, and reusing the ID with different content is rejected.
 - Every applied package produces an audit entry, per-revision provenance

@@ -1,5 +1,6 @@
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { Prisma, PrismaClient } from "@/generated/prisma/client";
+import { databaseFilePath, fileUrl } from "./dbLocation";
 
 export type Db = PrismaClient;
 export type Tx = Prisma.TransactionClient;
@@ -14,7 +15,7 @@ const globalForDb = globalThis as unknown as { __wordlyDb?: Db };
 /** Process-wide client for the Next.js app. Services take a `db` argument instead of calling this. */
 export function getDb(): Db {
   if (!globalForDb.__wordlyDb) {
-    globalForDb.__wordlyDb = createDb(process.env.DATABASE_URL ?? "file:./prisma/dev.db");
+    globalForDb.__wordlyDb = createDb(fileUrl(databaseFilePath()));
   }
   return globalForDb.__wordlyDb;
 }

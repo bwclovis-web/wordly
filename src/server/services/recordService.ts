@@ -132,7 +132,14 @@ export async function getRecord(db: DbOrTx, projectId: string, recordId: string)
 }
 
 export interface RevisionWithSource extends RevisionView {
-  source: { kind: string; actor: string; conversationLabel: string | null; url: string | null; packageId: string | null };
+  source: {
+    kind: string;
+    actor: string;
+    conversationLabel: string | null;
+    url: string | null;
+    packageId: string | null;
+    originalFilename: string | null;
+  };
 }
 
 export async function listRevisions(db: DbOrTx, recordId: string): Promise<RevisionWithSource[]> {
@@ -149,6 +156,7 @@ export async function listRevisions(db: DbOrTx, recordId: string): Promise<Revis
       conversationLabel: r.source.conversationLabel,
       url: r.source.url,
       packageId: r.source.packageId,
+      originalFilename: r.source.originalFilename,
     },
   }));
 }

@@ -23,6 +23,8 @@ export interface CreateRecordMutation {
   body: string;
   fields: JsonObject;
   authorityStatus: AuthorityStatus;
+  /** Request protection at creation. Cannot lower the type's default (manuscript is always protected). */
+  protected?: boolean;
   operationIndex?: number;
 }
 
@@ -55,6 +57,7 @@ export interface MutationSource {
   conversationLabel?: string | null;
   url?: string | null;
   packageId?: string | null;
+  originalFilename?: string | null;
 }
 
 export interface MutationContext {
@@ -182,7 +185,7 @@ export async function planMutations(
         mutation: m,
         recordId,
         type: m.type,
-        protected: defaultProtectedFor(m.type),
+        protected: m.protected === true || defaultProtectedFor(m.type),
         before: null,
         beforeRevision: null,
         after: {
@@ -371,6 +374,7 @@ export async function applyMutationsInTx(
       conversationLabel: ctx.source.conversationLabel ?? null,
       url: ctx.source.url ?? null,
       packageId: ctx.source.packageId ?? null,
+      originalFilename: ctx.source.originalFilename ?? null,
     },
   });
 
@@ -466,17 +470,22 @@ export async function setRecordProtection(
   db: Db,
   input: { projectId: string; recordId: string; protected: boolean; actor: string },
 ): Promise<void> {
-  await db.$transaction(async (tx) => {
-    const record = await tx.record.findFirst({ where: { id: input.recordId, projectId: input.projectId } });
-    if (!record) throw new NotFoundError(`Record ${input.recordId} not found`);
-    if (record.protected === input.protected) return;
-    await tx.record.update({ where: { id: record.id }, data: { protected: input.protected } });
-    await writeAudit(tx, {
-      projectId: input.projectId,
-      action: "record.protection",
-      actor: input.actor,
-      summary: `${input.protected ? "Protected" : "Unprotected"} "${record.title}"`,
-      details: { recordId: record.id, protected: input.protected },
-    });
+  await db.$transaction((tx) => setRecordProtectionInTx(tx, input));
+}
+
+export async function setRecordProtectionInTx(
+  tx: Tx,
+  input: { projectId: string; recordId: string; protected: boolean; actor: string },
+): Promise<void> {
+  const record = await tx.record.findFirst({ where: { id: input.recordId, projectId: input.projectId } });
+  if (!record) throw new NotFoundError(`Record ${input.recordId} not found`);
+  if (record.protected === input.protected) return;
+  await tx.record.update({ where: { id: record.id }, data: { protected: input.protected } });
+  await writeAudit(tx, {
+    projectId: input.projectId,
+    action: "record.protection",
+    actor: input.actor,
+    summary: `${input.protected ? "Protected" : "Unprotected"} "${record.title}"`,
+    details: { recordId: record.id, protected: input.protected },
   });
 }

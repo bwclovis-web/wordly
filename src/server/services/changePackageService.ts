@@ -187,7 +187,9 @@ async function analyze(db: DbOrTx, input: string | unknown, target: PackageTarge
   const { pkg, contentHash } = parsed;
   const issues: Issue[] = [];
 
-  const previous = await db.changePackage.findUnique({ where: { packageId: pkg.packageId } });
+  const previous = await db.changePackage.findUnique({
+    where: { projectId_packageId: { projectId: target.projectId, packageId: pkg.packageId } },
+  });
   if (previous) {
     if (previous.contentHash === contentHash) {
       return {
@@ -402,7 +404,9 @@ export async function applyChangePackage(
   try {
     const result = await db.$transaction(
       async (tx) => {
-        const existing = await tx.changePackage.findUnique({ where: { packageId: pkg.packageId } });
+        const existing = await tx.changePackage.findUnique({
+          where: { projectId_packageId: { projectId: pkg.projectId, packageId: pkg.packageId } },
+        });
         if (existing) {
           if (existing.contentHash === contentHash) {
             throw new AlreadyAppliedSignal(JSON.parse(existing.resultJson) as PackageApplyResult);
@@ -509,7 +513,9 @@ export async function applyChangePackage(
     if (error instanceof AlreadyAppliedSignal) return { status: "already_applied", result: error.result };
     if (error instanceof MutationRejectedError) return { status: "rejected", issues: error.issues };
     if (isUniqueConstraintError(error)) {
-      const existing = await db.changePackage.findUnique({ where: { packageId: pkg.packageId } });
+      const existing = await db.changePackage.findUnique({
+        where: { projectId_packageId: { projectId: pkg.projectId, packageId: pkg.packageId } },
+      });
       if (existing && existing.contentHash === contentHash) {
         return { status: "already_applied", result: JSON.parse(existing.resultJson) as PackageApplyResult };
       }

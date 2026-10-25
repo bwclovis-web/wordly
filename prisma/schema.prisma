@@ -29,6 +29,7 @@ model Project {
   changePackages ChangePackage[]
   auditEntries   AuditEntry[]
   reviewItems    ReviewItem[]
+  importedFiles  ImportedFile[]
 
   @@index([workspaceId])
 }
@@ -54,6 +55,7 @@ model Record {
   updatedAt            DateTime     @updatedAt
   revisions            Revision[]
   reviewItems          ReviewItem[]
+  importedFiles        ImportedFile[]
 
   @@index([projectId, type])
 }
@@ -82,12 +84,14 @@ model Source {
   id                String     @id
   projectId         String
   project           Project    @relation(fields: [projectId], references: [id])
-  /// ui | change_package | api
+  /// ui | change_package | markdown_import | api
   kind              String
   actor             String
   conversationLabel String?
   url               String?
   packageId         String?
+  /// Original filename for file imports.
+  originalFilename  String?
   createdAt         DateTime   @default(now())
   revisions         Revision[]
 
@@ -95,8 +99,9 @@ model Source {
 }
 
 model ChangePackage {
-  /// Author/assistant-supplied package ID; the unique key enforces idempotency.
-  packageId     String   @id
+  /// Author/assistant-supplied package ID. Idempotency is scoped per project,
+  /// so a restored copy of a project keeps its own applied-package history.
+  packageId     String
   projectId     String
   project       Project  @relation(fields: [projectId], references: [id])
   formatVersion Int
@@ -107,7 +112,7 @@ model ChangePackage {
   resultJson    String
   appliedAt     DateTime @default(now())
 
-  @@index([projectId])
+  @@id([projectId, packageId])
 }
 
 model AuditEntry {
@@ -143,4 +148,27 @@ model ReviewItem {
   resolvedAt          DateTime?
 
   @@index([projectId, status])
+}
+
+/// A file imported into a record, kept verbatim with its original filename.
+model ImportedFile {
+  id               String   @id
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id])
+  batchId          String
+  originalFilename String
+  /// sha256 of `content`; used for duplicate detection.
+  contentHash      String
+  content          String
+  byteSize         Int
+  recordId         String
+  record           Record   @relation(fields: [recordId], references: [id])
+  /// created | replaced
+  action           String
+  revisionNumber   Int
+  sourceId         String
+  createdAt        DateTime @default(now())
+
+  @@index([projectId, contentHash])
+  @@index([recordId])
 }

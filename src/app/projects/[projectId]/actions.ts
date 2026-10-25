@@ -15,6 +15,14 @@ import {
   type PackagePreview,
 } from "@/server/services/changePackageService";
 import { exportContextBundle } from "@/server/services/contextExportService";
+import {
+  applyMarkdownImport,
+  previewMarkdownImport,
+  type MarkdownFile,
+  type MarkdownImportItem,
+  type MarkdownImportOutcome,
+  type MarkdownImportPreview,
+} from "@/server/services/markdownImportService";
 import { createRecord, setAuthorityStatus, setProtection, updateRecord } from "@/server/services/recordService";
 import { resolveReviewItem } from "@/server/services/reviewService";
 
@@ -136,6 +144,26 @@ export async function exportBundleAction(
     includeSchema,
   });
   return JSON.stringify(bundle, null, 2);
+}
+
+export async function previewMarkdownAction(projectId: string, files: MarkdownFile[]): Promise<MarkdownImportPreview> {
+  return previewMarkdownImport(getDb(), projectId, files);
+}
+
+export async function applyMarkdownAction(
+  projectId: string,
+  items: MarkdownImportItem[],
+  conversationLabel: string,
+  confirmProtectedReplacements: boolean,
+): Promise<MarkdownImportOutcome> {
+  const outcome = await applyMarkdownImport(getDb(), {
+    projectId,
+    items,
+    conversationLabel: conversationLabel.trim() || null,
+    confirmProtectedReplacements,
+  });
+  if (outcome.status === "applied") revalidatePath(`/projects/${projectId}`, "layout");
+  return outcome;
 }
 
 export async function resolveReviewItemAction(projectId: string, reviewItemId: string) {

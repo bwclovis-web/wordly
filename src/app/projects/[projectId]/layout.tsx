@@ -25,6 +25,7 @@ export default async function ProjectLayout({
         </span>
         <Link href={base}>Records</Link>
         <Link href={`${base}/import`}>Import change package</Link>
+        <Link href={`${base}/import-markdown`}>Import Markdown references</Link>
         <Link href={`${base}/export`}>Export context</Link>
         <Link href={`${base}/history`}>History &amp; review</Link>
       </nav>

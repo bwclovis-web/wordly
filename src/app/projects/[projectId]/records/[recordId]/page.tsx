@@ -130,6 +130,11 @@ export default async function RecordPage({
                             </div>
                           ) : null}
                         </>
+                      ) : r.source.kind === "markdown_import" ? (
+                        <>
+                          Markdown import of <code>{r.source.originalFilename}</code>
+                          {r.source.conversationLabel ? <div className="muted">{r.source.conversationLabel}</div> : null}
+                        </>
                       ) : (
                         <>{r.source.kind} ({r.source.actor})</>
                       )}
