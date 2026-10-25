@@ -1,0 +1,55 @@
+{
+  "format": "wordly.change-package",
+  "formatVersion": 1,
+  "packageId": "pkg_demo_2026-10-25_mara-age",
+  "workspaceId": "wsp_demo",
+  "projectId": "prj_demo_salt_archive",
+  "summary": "Approved: Mara is 34; resolve the age decision; add a continuity note.",
+  "source": {
+    "conversationLabel": "Character development: Mara Venn",
+    "url": "https://chatgpt.com/c/example"
+  },
+  "approval": {
+    "status": "approved",
+    "statement": "Update the working files with the decisions I approved."
+  },
+  "scope": "reference",
+  "protectedOverrides": [],
+  "operations": [
+    {
+      "op": "update_record",
+      "recordId": "rec_demo_mara_dossier",
+      "expectedRevision": 1,
+      "changes": {
+        "body": {
+          "replace": "Archivist of the Salt Guild. Thirty-four years old. Lost her brother in the flood of the Lower Stacks."
+        },
+        "fields": { "set": { "age": 34 } }
+      },
+      "note": "Age raised to fit the decade of morning ledger checks."
+    },
+    {
+      "op": "update_record",
+      "recordId": "rec_demo_decision_mara_age",
+      "expectedRevision": 1,
+      "changes": {
+        "body": { "replace": "Decision: Mara is 34. She began checking the ledger at 24." }
+      },
+      "authorityStatus": "approved"
+    },
+    {
+      "op": "create_record",
+      "newRecordId": "rec_demo_note_mara_age",
+      "type": "continuity_note",
+      "title": "Mara's age continuity",
+      "body": "Mara is 34 as of Chapter 1. Any reference to her being thirty must be revised.",
+      "authorityStatus": "approved"
+    }
+  ],
+  "relatedRecords": [
+    {
+      "recordId": "rec_demo_ch01_prose",
+      "note": "Chapter 1 prose implies the timeline; confirm it still reads correctly with Mara at 34."
+    }
+  ]
+}

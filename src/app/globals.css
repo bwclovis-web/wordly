@@ -1,0 +1,79 @@
+:root {
+  --bg: #f7f6f3;
+  --panel: #ffffff;
+  --text: #1f1f1f;
+  --muted: #6b6b6b;
+  --border: #dedbd4;
+  --accent: #2d5a8a;
+  --danger: #a32020;
+  --warn: #8a5a00;
+  --ok: #24663a;
+  --add-bg: #dff3e4;
+  --remove-bg: #fbe0e0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3 { margin: 0 0 0.6rem; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.2rem; margin-top: 1.4rem; }
+h3 { font-size: 1rem; }
+code, pre, textarea.mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 0.85rem; }
+pre { white-space: pre-wrap; word-break: break-word; margin: 0; }
+
+.topbar { display: flex; gap: 1.5rem; align-items: baseline; padding: 0.8rem 1.5rem; background: var(--panel); border-bottom: 1px solid var(--border); }
+.topbar .brand { font-weight: 700; color: var(--text); }
+.topbar .note { color: var(--muted); font-size: 0.8rem; margin-left: auto; }
+main { max-width: 1150px; margin: 0 auto; padding: 1.2rem 1.5rem 4rem; }
+
+.subnav { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-bottom: 1.2rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+.subnav .title { font-weight: 600; margin-right: 1rem; }
+
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; margin-bottom: 1rem; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.row { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: 0.6rem; }
+.muted { color: var(--muted); }
+.small { font-size: 0.85rem; }
+
+label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; color: var(--muted); }
+label.inline { flex-direction: row; align-items: center; gap: 0.4rem; color: var(--text); }
+input[type="text"], select, textarea { font: inherit; padding: 0.4rem 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: #fff; color: var(--text); }
+textarea { width: 100%; min-height: 8rem; resize: vertical; }
+button { font: inherit; padding: 0.4rem 0.9rem; border-radius: 4px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+button.secondary { background: #fff; color: var(--accent); }
+button.danger { background: var(--danger); border-color: var(--danger); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; }
+
+.badge { display: inline-block; padding: 0.05rem 0.45rem; border-radius: 999px; font-size: 0.75rem; border: 1px solid var(--border); background: #f1efe9; color: var(--text); white-space: nowrap; }
+.badge.approved { background: #e2f1e6; border-color: #b9dcc3; color: var(--ok); }
+.badge.proposed { background: #e6eef8; border-color: #bcd0ea; color: var(--accent); }
+.badge.superseded { background: #eee; color: var(--muted); text-decoration: line-through; }
+.badge.unresolved { background: #fbf0d9; border-color: #ecd59e; color: var(--warn); }
+.badge.protected { background: #fbe0e0; border-color: #f0b8b8; color: var(--danger); }
+.badge.manuscript { background: #efe6f8; border-color: #d4c0ea; color: #5a2d8a; }
+
+.issues { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.issue { padding: 0.4rem 0.6rem; border-radius: 4px; font-size: 0.88rem; }
+.issue.error { background: var(--remove-bg); color: var(--danger); }
+.issue.warning { background: #fbf0d9; color: var(--warn); }
+.issue code { font-weight: 600; }
+
+.diff { background: #fbfbfa; border: 1px solid var(--border); border-radius: 4px; padding: 0.6rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.diff ins { background: var(--add-bg); text-decoration: none; }
+.diff del { background: var(--remove-bg); }
+
+.banner { padding: 0.7rem 0.9rem; border-radius: 6px; margin-bottom: 1rem; }
+.banner.ok { background: var(--add-bg); color: var(--ok); }
+.banner.error { background: var(--remove-bg); color: var(--danger); }
+.banner.info { background: #e6eef8; color: var(--accent); }

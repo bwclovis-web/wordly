@@ -1,0 +1,366 @@
+{
+  "$id": "https://wordly-editor.local/schemas/change-package.v1.json",
+  "title": "Wordly change package v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "format": {
+      "type": "string",
+      "const": "wordly.change-package"
+    },
+    "formatVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "packageId": {
+      "type": "string",
+      "pattern": "^pkg_[A-Za-z0-9_-]{6,80}$"
+    },
+    "workspaceId": {
+      "type": "string",
+      "pattern": "^wsp_[A-Za-z0-9_-]{4,64}$"
+    },
+    "projectId": {
+      "type": "string",
+      "pattern": "^prj_[A-Za-z0-9_-]{4,64}$"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "conversationLabel": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "url": {
+          "type": "string",
+          "maxLength": 2000,
+          "format": "uri"
+        }
+      },
+      "additionalProperties": false
+    },
+    "approval": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "proposed"
+          ]
+        },
+        "statement": {
+          "type": "string",
+          "maxLength": 4000
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "default": "reference",
+      "type": "string",
+      "enum": [
+        "reference",
+        "manuscript"
+      ]
+    },
+    "protectedOverrides": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^rec_[A-Za-z0-9_-]{6,64}$"
+      }
+    },
+    "operations": {
+      "minItems": 1,
+      "maxItems": 500,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "op": {
+                "type": "string",
+                "const": "create_record"
+              },
+              "newRecordId": {
+                "type": "string",
+                "pattern": "^rec_[A-Za-z0-9_-]{6,64}$"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "manuscript_chapter",
+                  "chapter_outline",
+                  "story_architecture",
+                  "character_dossier",
+                  "worldbuilding",
+                  "canon_decision",
+                  "continuity_note",
+                  "reference_note"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "body": {
+                "default": "",
+                "type": "string",
+                "maxLength": 2000000
+              },
+              "fields": {
+                "default": {},
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "additionalProperties": {
+                  "$ref": "#/$defs/__schema0"
+                }
+              },
+              "authorityStatus": {
+                "type": "string",
+                "enum": [
+                  "draft",
+                  "proposed",
+                  "approved",
+                  "superseded",
+                  "unresolved"
+                ]
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "op",
+              "type",
+              "title",
+              "authorityStatus"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "op": {
+                "type": "string",
+                "const": "update_record"
+              },
+              "recordId": {
+                "type": "string",
+                "pattern": "^rec_[A-Za-z0-9_-]{6,64}$"
+              },
+              "expectedRevision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "changes": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "object",
+                    "properties": {
+                      "replace": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 500
+                      }
+                    },
+                    "required": [
+                      "replace"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "body": {
+                    "type": "object",
+                    "properties": {
+                      "replace": {
+                        "type": "string",
+                        "maxLength": 2000000
+                      }
+                    },
+                    "required": [
+                      "replace"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "fields": {
+                    "type": "object",
+                    "properties": {
+                      "set": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "additionalProperties": {
+                          "$ref": "#/$defs/__schema0"
+                        }
+                      },
+                      "unset": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "authorityStatus": {
+                "type": "string",
+                "enum": [
+                  "draft",
+                  "proposed",
+                  "approved",
+                  "superseded",
+                  "unresolved"
+                ]
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "op",
+              "recordId",
+              "expectedRevision",
+              "changes"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "op": {
+                "type": "string",
+                "const": "set_authority_status"
+              },
+              "recordId": {
+                "type": "string",
+                "pattern": "^rec_[A-Za-z0-9_-]{6,64}$"
+              },
+              "expectedRevision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "draft",
+                  "proposed",
+                  "approved",
+                  "superseded",
+                  "unresolved"
+                ]
+              },
+              "supersededBy": {
+                "type": "string",
+                "pattern": "^rec_[A-Za-z0-9_-]{6,64}$"
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "op",
+              "recordId",
+              "expectedRevision",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "relatedRecords": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "recordId": {
+            "type": "string",
+            "pattern": "^rec_[A-Za-z0-9_-]{6,64}$"
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "recordId",
+          "note"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "format",
+    "formatVersion",
+    "packageId",
+    "workspaceId",
+    "projectId",
+    "summary",
+    "approval",
+    "operations"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema0"
+          }
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema0"
+          }
+        }
+      ]
+    }
+  }
+}

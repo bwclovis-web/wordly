@@ -1,0 +1,146 @@
+// Enumerated values (record type, authority status, source kind, ...) are stored
+// as strings and validated in src/domain; SQLite has no native enum type.
+// JSON payloads are stored as strings and parsed in the service layer.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Workspace {
+  id        String    @id
+  name      String
+  createdAt DateTime  @default(now())
+  projects  Project[]
+}
+
+model Project {
+  id             String          @id
+  workspaceId    String
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id])
+  title          String
+  createdAt      DateTime        @default(now())
+  records        Record[]
+  sources        Source[]
+  changePackages ChangePackage[]
+  auditEntries   AuditEntry[]
+  reviewItems    ReviewItem[]
+
+  @@index([workspaceId])
+}
+
+/// Current state of a record. Every state is also captured as an immutable Revision.
+model Record {
+  id                   String       @id
+  projectId            String
+  project              Project      @relation(fields: [projectId], references: [id])
+  /// Document type (see src/domain/recordTypes.ts).
+  type                 String
+  title                String
+  body                 String
+  /// JSON object of structured fields.
+  fields               String       @default("{}")
+  /// Canon/decision status (see src/domain/statuses.ts).
+  authorityStatus      String
+  supersededByRecordId String?
+  /// Manuscript protection flag; independent of type and status.
+  protected            Boolean      @default(false)
+  currentRevision      Int
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  revisions            Revision[]
+  reviewItems          ReviewItem[]
+
+  @@index([projectId, type])
+}
+
+model Revision {
+  id                   String   @id
+  recordId             String
+  record               Record   @relation(fields: [recordId], references: [id])
+  revisionNumber       Int
+  title                String
+  body                 String
+  fields               String
+  authorityStatus      String
+  supersededByRecordId String?
+  contentHash          String
+  sourceId             String
+  source               Source   @relation(fields: [sourceId], references: [id])
+  createdAt            DateTime @default(now())
+
+  @@unique([recordId, revisionNumber])
+  @@index([sourceId])
+}
+
+/// Provenance: who or what produced a set of revisions.
+model Source {
+  id                String     @id
+  projectId         String
+  project           Project    @relation(fields: [projectId], references: [id])
+  /// ui | change_package | api
+  kind              String
+  actor             String
+  conversationLabel String?
+  url               String?
+  packageId         String?
+  createdAt         DateTime   @default(now())
+  revisions         Revision[]
+
+  @@index([projectId])
+}
+
+model ChangePackage {
+  /// Author/assistant-supplied package ID; the unique key enforces idempotency.
+  packageId     String   @id
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id])
+  formatVersion Int
+  contentHash   String
+  summary       String
+  status        String
+  rawJson       String
+  resultJson    String
+  appliedAt     DateTime @default(now())
+
+  @@index([projectId])
+}
+
+model AuditEntry {
+  id          String   @id
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  action      String
+  actor       String
+  sourceId    String?
+  packageId   String?
+  summary     String
+  detailsJson String
+  createdAt   DateTime @default(now())
+
+  @@index([projectId, createdAt])
+}
+
+/// A record flagged for future review. Never an edit by itself.
+model ReviewItem {
+  id                  String    @id
+  projectId           String
+  project             Project   @relation(fields: [projectId], references: [id])
+  recordId            String
+  record              Record    @relation(fields: [recordId], references: [id])
+  packageId           String?
+  triggeredByRecordId String?
+  /// package_note | detected_mention
+  origin              String
+  note                String
+  /// open | resolved
+  status              String    @default("open")
+  createdAt           DateTime  @default(now())
+  resolvedAt          DateTime?
+
+  @@index([projectId, status])
+}

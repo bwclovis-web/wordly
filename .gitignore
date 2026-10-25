@@ -1,0 +1,47 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+src/generated/
+
+# Environment and secrets (only the template is tracked)
+.env
+.env.*
+!.env.example
+
+# Local databases anywhere in the tree, including SQLite journal/WAL files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# Private content: manuscripts, imported references, context exports,
+# backups, recovery files and local uploads. Invented examples live in
+# examples/ and tests/fixtures/ and stay tracked.
+backups/
+exports/
+imports/
+uploads/
+private/
+manuscripts/
+references/
+recovery/
+*.bak
+*.backup
+context-bundle-*.json
+*.wordly-backup.json
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log
